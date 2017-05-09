@@ -51,15 +51,16 @@ If you haven't had [SBT](http://www.scala-sbt.org/download.html) installed, proc
 
 _If you are using Windows, please ensure `sbt` is installed on the Linux VM._
 
+### Maven
+[Maven](https://maven.apache.org/) is an another build tool that Lagom Chirper is configured for. If you wish to try out the Maven support, make sure that you've [installed it](https://maven.apache.org/download.cgi).
+
+If you are using Windows, please ensure `mvn` is installed on the Linux VM.
+
 ### Docker
 
-[Lightbend Production Suite](https://www.lightbend.com/platform/production) and [Production Suite Sandbox](https://www.lightbend.com/product/conductr/developer) don't have any direct dependency on Docker. As such, it's possible to run both [Lightbend Production Suite](https://www.lightbend.com/platform/production) and [Production Suite Sandbox](https://www.lightbend.com/product/conductr/developer) without Docker being installed.
+[Lightbend Production Suite](https://www.lightbend.com/platform/production) and [Production Suite Sandbox](https://www.lightbend.com/product/conductr/developer) don't have any direct dependency on Docker. As such, it's possible to run both the [Lightbend Production Suite](https://www.lightbend.com/platform/production) and [Production Suite Sandbox](https://www.lightbend.com/product/conductr/developer) without Docker being installed.
 
-[Lightbend Production Suite](https://www.lightbend.com/platform/production) allows declaring endpoints to be exposed to the public via proxy. This proxy is dynamic - the routed addresses will be updated to reflect changes when application(s) scale up or down.
-
-Lagom Chirper requires Dynamic Proxying feature provided by the [Lightbend Production Suite](https://www.lightbend.com/platform/production) which is dependent on HAProxy. The Dynamic Proxying feature ensures the proxy is always up to date with changes caused when application(s) scale up or down.
-
-The dynamic proxying in the local [Production Suite Sandbox](https://www.lightbend.com/product/conductr/developer) relies on HAProxy running within Docker container.
+However, Lagom Chirper requires the Dynamic Proxying feature provided by the Production Suite. Since the [Production Suite Sandbox](https://www.lightbend.com/product/conductr/developer) provides this feature via a Docker container thus deploying Lagom Chirper to the sandbox will require the installation of Docker. Additionally, if you're using the Maven build of Chirper you'll also need to install Docker.
 
 _If you are using Windows and wish to continue with Docker installation, please ensure Docker is installed on the Linux VM._
 
@@ -97,15 +98,21 @@ Go to the cloned Lagom Chirper directory
 cd ~/examples/activator-lagom-java-chirper
 ```
 
-Deploy the Lagom Chirper application.
+Deploy the Lagom Chirper application. It is packaged as both an SBT and Maven application.
 
+SBT:
 ```bash
 sbt install
 ```
 
-When you run `sbt` for the first time, it may take a while for the `sbt install` task to complete since `sbt` will need to download all the artefacts required by the project. On the subsequent `sbt install`, the time it takes for the tasks to complete will be significantly faster.
+Maven:
+```bash
+./mvn-install
+```
 
-Once the artefacts are downloaded, `sbt install` command will perform the following tasks:
+When you deploy Chirper for the first time, it may take a while since the build tool will need to download all the artefacts required by the project. On subsequent deploys, the time it takes for the tasks to complete will be significantly faster.
+
+Once the artefacts are downloaded, the following tasks will be performed:
 
 * Build the local configuration for Cassandra.
 * Build the Bundle for `Activity Stream`, `Chirp`, `Friend`, and `Front-End` service respectively.
@@ -116,7 +123,7 @@ _Bundle_ is a special term coined by [Lightbend Production Suite](https://www.li
 
 > A bundle is an archive of components along with meta data (a bundle descriptor file) describing how the files should be executed. Bundles are similar to executable JARs with the difference being that they are not constrained to executing just JVM code. Bundles are also named using a digest of their contents so that their integrity may be assured. Bundles represent a unit of software that may have a release cycle which is distinct from other bundles.
 
-Once `sbt install` has finished running, the `conduct info` command will allow you to inspect the state of the deployed services. When you run `conduct info`, you should see something similar to this.
+Once deployed, the `conduct info` command will allow you to inspect the state of the deployed services. When you run `conduct info`, you should see something similar to this.
 
 ```
 Felixs-MBP-2:activator-lagom-java-chirper felixsatyaputra$ conduct info
@@ -168,8 +175,12 @@ The predictable application start behavior allows scripting of the deployment us
 To see an example of a deployment script from Lagom Chirper, execute the following command.
 
 ```bash
-sbt generateInstallationScript
-cat target/install.sh
+sbt generateInstallationScript && cat target/install.sh
+```
+
+Maven:
+```bash
+cat ./mvn-install
 ```
 
 You should see something similar to the following.
@@ -354,14 +365,16 @@ d842342          chirp-impl             v1     1     0     1  web
 
 Firstly, we'll build a newer version of the `Friend` service. There's no change in the binary as such, but the process of the rolling upgrade will be the same regardless.
 
+SBT:
 ```bash
-sbt friend-impl/clean friend-impl/bundle:dist
+sbt friend-impl/clean friend-impl/bundle:dist && \
+conduct load -q $(find friend-impl/target -iname "friend-impl-*.zip" | head -n 1) | xargs conduct run
 ```
 
-We'll load and run this new bundle.
-
+Maven:
 ```bash
-conduct load -q $(find friend-impl/target -iname "friend-impl-*.zip" | head -n 1) | xargs conduct run
+(cd friend-impl && mvn clean package docker:build) && \
+docker save chirper/friend-impl | bndl --no-default-check --endpoint friend --endpoint akka-remote | conduct load
 ```
 
 We now have a new instance of `Friend` service running alongside existing one. The existing `Friend` service has `01dd0af` as its Bundle Id while the new one has `87375e6`.
@@ -702,9 +715,15 @@ By default [Production Suite Sandbox](https://www.lightbend.com/product/conductr
 
 If you wish to see the actual Elasticsearch bundle in action, execute the following command. The Sandbox Elasticsearch instance is configured with the JVM heap sized to `1GB`. Ensure your machine has sufficient memory resource to run Elasticsearch with all Lagom Chirper services.
 
+SBT:
 ```bash
 sandbox run 2.0.0 -n 3 -f visualization -f logging
 sbt install
+```
+Maven:
+```bash
+sandbox run 2.0.0 -n 3 -f visualization -f logging
+./mvn-install
 ```
 
 When using RSYSLOG, apart from directing the logs into the RSYSLOG logging service, the logs can be sent to any log aggregator that speaks syslog protocol. An example of such aggregator is [Papertrail](http://conductr.lightbend.com/docs/2.0.x/ConsolidatedLogging#Setting-up-Papertrail).
@@ -733,8 +752,13 @@ sandbox run 2.0.0 -n 3:3
 
 Redeploy the Lagom Chirper example.
 
+SBT:
 ```bash
 sbt install
+```
+Maven:
+```bash
+./mvn-install
 ```
 
 Let's scale `Front-End` to `3` instances.
