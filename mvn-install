@@ -2,6 +2,10 @@
 
 set -e
 
+which mvn &>/dev/null || (echo '* maven not found; did you install it?' && exit 2)
+which docker &>/dev/null || (echo '* docker not found; did you install it?' && exit 2)
+which sandbox &>/dev/null || (echo '* sandbox not found; did you install the ConductR Developer Sandbox?' && exit 2)
+
 echo "* building project"
 
 mvn clean package docker:build
