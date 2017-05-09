@@ -1,76 +1,76 @@
 # Deploying Chirper
 
-This page describes the steps required to deploy the Lagom Chirper example into [Production Suite Sandbox](https://www.lightbend.com/product/conductr/developer).
+This page describes the steps required to deploy the Lagom Chirper example into [Enterprise Suite Sandbox](https://www.lightbend.com/product/conductr/developer).
 
-[Production Suite Sandbox](https://www.lightbend.com/product/conductr/developer) has the same features and functionality as the [Lightbend Production Suite](https://www.lightbend.com/platform/production), albeit packaged to run on the local developer workstation.
+[Enterprise Suite Sandbox](https://www.lightbend.com/product/conductr/developer) has the same features and functionality as the [Lightbend Enterprise Suite](https://www.lightbend.com/platform/production), albeit packaged to run on the local developer workstation.
 
 The Sandbox provides a near production-like environment to run your services on the local developer. It allows developers to deploy multiple services, and to run these services in the way similar to how the services will be run in the actual production environment with clustering, service location, dynamic proxying and various other features provided by the Sandbox.
 
-Using the Sandbox, we will also go through some of the features provided by [Lightbend Production Suite](https://www.lightbend.com/platform/production) to help operations manage and scale distributed systems.
+Using the Sandbox, we will also go through some of the features provided by [Lightbend Enterprise Suite](https://www.lightbend.com/platform/production) to help operations manage and scale distributed systems.
 
 This page is written as a companion to the book [Deploying Reactive Microservices: Strategies for Delivering Resilient Systems](http://todo). However, if you arrive to this page without having read the book, you should still be able to follow the steps outlined by this page independent of the book.
 
 ## Register with Lightbend.com
 
-Please consider registering with [Lightbend.com](https://www.lightbend.com/account/register). Registration is free, and it will allow you to obtain the Community Edition of the Lightbend Production Suite.
+Please consider registering with [Lightbend.com](https://www.lightbend.com/account/register). Registration is free, and it will allow you to obtain the Community Edition of the Lightbend Enterprise Suite.
 
-For a microservice based system, it's expected to have multiple instances of various services to be running at the same time. The Community Edition of the Production Suite allows _each_ of these services to be scaled up to three instances. As part of the feature tour below, we will be scaling the `Activity Stream` service within the Lagom Chirper example to 3 instances each.
+For a microservice based system, it's expected to have multiple instances of various services to be running at the same time. The Community Edition of the Enterprise Suite allows _each_ of these services to be scaled up to three instances. As part of the feature tour below, we will be scaling the `Activity Stream` service within the Lagom Chirper example to 3 instances each.
 
-Once you have registered, be sure to download the ebook [Deploying Reactive Microservices: Strategies for Delivering Resilient Systems](https://todo) available free for registered user. This ebook is a follow on from [Reactive Microservices Architecture](https://todo) and [Developing Reactive Microservices](https://todo), which will also be freely available to download once registered.
+Once you have registered, be sure to download the ebook [Deploying Reactive Microservices: Strategies for Delivering Resilient Systems](https://todo) available free for registered users. This ebook is a follow on from [Reactive Microservices Architecture](https://todo) and [Developing Reactive Microservices](https://todo), which will also be freely available to download once registered.
 
-## Pre-requisite
+## Prerequisites
 
-Please ensure the following pre-requisite is present before starting with the actual deployment.
+Please ensure the following prerequisites are present before starting with the actual deployment.
 
-### Operating Systems
+#### Operating Systems
 
 If you are using Linux or MacOS, please continue to the next step.
 
-If you are using Windows, please install a Linux VM, preferably `Ubuntu 16.04 LTS`. The Linux VM is required for running [Production Suite Sandbox](https://www.lightbend.com/product/conductr/developer) on Windows.
+If you are using Windows, please install a Linux VM, preferably `Ubuntu 16.04 LTS`. The Linux VM is required for running [Enterprise Suite Sandbox](https://www.lightbend.com/product/conductr/developer) on Windows.
 
-If you do not wish to install a Linux VM at this stage, you will still be able to deploy the Lagom Chirper example on top of [Lightbend Production Suite](https://www.lightbend.com/platform/production) running on [AWS](#Deploying_to_AWS).
+If you do not wish to install a Linux VM at this stage, you will still be able to deploy the Lagom Chirper example on top of [Lightbend Enterprise Suite](https://www.lightbend.com/platform/production) running on [AWS](#Deploying_to_AWS).
 
-### JDK 8 or Java 8
+#### JDK 8 or Java 8
 
 Please ensure you have either JDK 8 or Java 8 installed from either OpenJDK or Oracle.
 
 _If you are using Windows, please ensure either JDK 8 or Java 8 installed from either OpenJDK or Oracle is installed on the Linux VM._
 
-### Git
+#### Git
 
 Please ensure you have `git` installed since we will be cloning the Lagom Chirper example.
 
 _If you are using Windows, please ensure `git` is installed on the Linux VM._
 
-### SBT
+#### Maven
+[Maven](https://maven.apache.org/) is one build tool that Lagom Chirper is configured for. If you wish to try out the Maven support, make sure that you've [installed it](https://maven.apache.org/download.cgi). You'll also need to install [Docker](https://www.docker.com/).
 
-[SBT](http://www.scala-sbt.org/download.html) is the build tool used by Lagom Chirper example.
+If you are using Windows, please ensure `mvn` and `docker` are installed on the Linux VM.
 
-If you haven't had [SBT](http://www.scala-sbt.org/download.html) installed, proceed with either installation steps for [Linux](http://www.scala-sbt.org/0.13/docs/Installing-sbt-on-Linux.html) or [MacOS](http://www.scala-sbt.org/0.13/docs/Installing-sbt-on-Mac.html).
+#### SBT
+
+[SBT](http://www.scala-sbt.org/download.html) is another build tool used by Lagom Chirper.
+
+If you haven't installed [SBT](http://www.scala-sbt.org/download.html) and wish to use the SBT build of Chirper, proceed with either installation steps for [Linux](http://www.scala-sbt.org/0.13/docs/Installing-sbt-on-Linux.html) or [MacOS](http://www.scala-sbt.org/0.13/docs/Installing-sbt-on-Mac.html).
 
 
 _If you are using Windows, please ensure `sbt` is installed on the Linux VM._
 
-### Maven
-[Maven](https://maven.apache.org/) is an another build tool that Lagom Chirper is configured for. If you wish to try out the Maven support, make sure that you've [installed it](https://maven.apache.org/download.cgi).
-
-If you are using Windows, please ensure `mvn` is installed on the Linux VM.
-
 ### Docker
 
-[Lightbend Production Suite](https://www.lightbend.com/platform/production) and [Production Suite Sandbox](https://www.lightbend.com/product/conductr/developer) don't have any direct dependency on Docker. As such, it's possible to run both the [Lightbend Production Suite](https://www.lightbend.com/platform/production) and [Production Suite Sandbox](https://www.lightbend.com/product/conductr/developer) without Docker being installed.
+[Lightbend Enterprise Suite](https://www.lightbend.com/platform/production) and [Enterprise Suite Sandbox](https://www.lightbend.com/product/conductr/developer) don't have any direct dependency on Docker. As such, it's possible to run both the [Lightbend Enterprise Suite](https://www.lightbend.com/platform/production) and [Enterprise Suite Sandbox](https://www.lightbend.com/product/conductr/developer) without Docker being installed.
 
-However, Lagom Chirper requires the Dynamic Proxying feature provided by the Production Suite. Since the [Production Suite Sandbox](https://www.lightbend.com/product/conductr/developer) provides this feature via a Docker container thus deploying Lagom Chirper to the sandbox will require the installation of Docker. Additionally, if you're using the Maven build of Chirper you'll also need to install Docker.
+However, Lagom Chirper requires the Dynamic Proxying feature provided by the Enterprise Suite. Since the [Enterprise Suite Sandbox](https://www.lightbend.com/product/conductr/developer) provides this feature via a Docker container, deploying Lagom Chirper to the sandbox will require the installation of Docker. Additionally, if you're using the Maven build of Chirper you'll also need to install Docker.
 
 _If you are using Windows and wish to continue with Docker installation, please ensure Docker is installed on the Linux VM._
 
 ## Deploying Lagom Chirper
 
-This section describes the steps to deploy Lagom Chirper example into [Production Suite Sandbox](https://www.lightbend.com/product/conductr/developer).
+This section describes the steps to deploy Lagom Chirper example into [Enterprise Suite Sandbox](https://www.lightbend.com/product/conductr/developer).
 
-### Production Suite Sandbox setup
+### Enterprise Suite Sandbox setup
 
-Follow the Production Suite Sandbox [installation guide](http://www.lightbend.com/product/conductr/developer). The whole process should take about 15 minutes including the download times for the artefact.
+Follow the Enterprise Suite Sandbox [installation guide](http://www.lightbend.com/product/conductr/developer). The whole process should take about 15 minutes including the download times for the artefact.
 
 To save time, you may choose stop at the end of **Inspect the Sandbox** step, and not continue with **Loading Reactive Maps** step and beyond.
 
@@ -98,16 +98,16 @@ Go to the cloned Lagom Chirper directory
 cd ~/examples/activator-lagom-java-chirper
 ```
 
-Deploy the Lagom Chirper application. It is packaged as both an SBT and Maven application.
-
-SBT:
-```bash
-sbt install
-```
+Deploy the Lagom Chirper application. It is packaged as both SBT and Maven. You'll want to pick the build tool you're most comfortable with.
 
 Maven:
 ```bash
 ./mvn-install
+```
+
+SBT:
+```bash
+sbt install
 ```
 
 When you deploy Chirper for the first time, it may take a while since the build tool will need to download all the artefacts required by the project. On subsequent deploys, the time it takes for the tasks to complete will be significantly faster.
@@ -119,7 +119,7 @@ Once the artefacts are downloaded, the following tasks will be performed:
 * Deploy and run Cassandra using the built local configuration.
 * Deploy and run `Activity Stream`, `Chirp`, `Friend`, and `Front-End` Bundles respectively.
 
-_Bundle_ is a special term coined by [Lightbend Production Suite](https://www.lightbend.com/platform/production):
+_Bundle_ is a special term coined by [Lightbend Enterprise Suite](https://www.lightbend.com/platform/production):
 
 > A bundle is an archive of components along with meta data (a bundle descriptor file) describing how the files should be executed. Bundles are similar to executable JARs with the difference being that they are not constrained to executing just JVM code. Bundles are also named using a digest of their contents so that their integrity may be assured. Bundles represent a unit of software that may have a release cycle which is distinct from other bundles.
 
@@ -141,7 +141,7 @@ d842342          chirp-impl             v1     1     0     1  web
 
 The frontend of the Chirper application will be available as well. Open http://192.168.10.1:9000/ in your browser to visit the Chirper frontend.
 
-Congratulations - you have now deployed Lagom Chirper into [Production Suite Sandbox](https://www.lightbend.com/product/conductr/developer)!
+Congratulations - you have now deployed Lagom Chirper into [Enterprise Suite Sandbox](https://www.lightbend.com/product/conductr/developer)!
 
 ### Lagom Chirper quick tour
 
@@ -158,30 +158,34 @@ Lagom Chirper comprises of the following services:
 The `Activity Stream`, `Chirp`, and `Friend` services are written in Lagom, while `Front-End` service is written in [Playframework](https://www.playframework.com/).
 
 
-### Production Suite feature tour
+### Enterprise Suite feature tour
 
 #### Service orchestration
 
-[Lightbend Production Suite](https://www.lightbend.com/platform/production) provides service orchestration as a core functionality where other features is based on.
+[Lightbend Enterprise Suite](https://www.lightbend.com/platform/production) provides service orchestration as a core functionality where other features is based on.
 
-When an application is deployed, [Production Suite](https://www.lightbend.com/platform/production) will ensure every instance is started one after another, in an orderly manner. Once an instance has been started successfully and confirmed to be healthy, only then the attempt to start the next instance proceeds.
+When an application is deployed, [Enterprise Suite](https://www.lightbend.com/platform/production) will ensure every instance is started one after another, in an orderly manner. Once an instance has been started successfully and confirmed to be healthy, only then the attempt to start the next instance proceeds.
 
-An application can inform [Production Suite](https://www.lightbend.com/platform/production) that it's ready to start by hitting a REST endpoint, or alternatively by invoking a check command that will call the same REST endpoint underneath. If your application is written in [Lagom](https://www.lagomframework.com/) or [Play](https://www.playframework.com/), health check will be invoked automatically by the inclusion of [SBT ConductR](https://github.com/typesafehub/sbt-conductr) plugin. For non-Lagom and non-Play application, [Signalling application state](http://conductr.lightbend.com/docs/2.0.x/SignalingApplicationState) page in the documentation has further details.
+An application can inform [Enterprise Suite](https://www.lightbend.com/platform/production) that it's ready to start by hitting a REST endpoint, or alternatively by invoking a check command that will call the same REST endpoint underneath. If your application is written in [Lagom](https://www.lagomframework.com/) or [Play](https://www.playframework.com/), health check will be invoked automatically by the inclusion of [SBT ConductR](https://github.com/typesafehub/sbt-conductr) plugin. For non-Lagom and non-Play application, [Signalling application state](http://conductr.lightbend.com/docs/2.0.x/SignalingApplicationState) page in the documentation has further details.
 
-If an application failed to start, [Production Suite](https://www.lightbend.com/platform/production) will attempt to restart the application for a given number of configurable attempts.
+If an application failed to start, [Enterprise Suite](https://www.lightbend.com/platform/production) will attempt to restart the application for a given number of configurable attempts.
 
 The predictable application start behavior allows scripting of the deployment using simple bash script and the [CLI](http://conductr.lightbend.com/docs/2.0.x/CLI). We believe this simplicity is an advantage as there is no need for operations to learn new language or DSL to start creating their own deployment script.
 
 To see an example of a deployment script from Lagom Chirper, execute the following command.
 
-```bash
-sbt generateInstallationScript && cat target/install.sh
-```
 
 Maven:
 ```bash
 cat ./mvn-install
 ```
+
+SBT:
+
+```bash
+sbt generateInstallationScript && cat target/install.sh
+```
+
 
 You should see something similar to the following.
 
@@ -220,15 +224,15 @@ conduct info
 
 Refer to [Orchestrating deployment using the CLI](http://conductr.lightbend.com/docs/2.0.x/DeployingBundlesOps#Using-CLI-to-orchestrate-bundle-deployments) section on the documentation for further details.
 
-The fact that application is started one at a time in a predictable manner also means that [Production Suite](https://www.lightbend.com/platform/production) is able to form a cluster for this application in a consistent and reliable way.
+The fact that application is started one at a time in a predictable manner also means that [Enterprise Suite](https://www.lightbend.com/platform/production) is able to form a cluster for this application in a consistent and reliable way.
 
-For applications is written in [Lagom](https://www.lagomframework.com/) with Akka Clustering enabled, [Production Suite](https://www.lightbend.com/platform/production) is able to form the Akka cluster automatically.
+For applications is written in [Lagom](https://www.lagomframework.com/) with Akka Clustering enabled, [Enterprise Suite](https://www.lightbend.com/platform/production) is able to form the Akka cluster automatically.
 
-For non-Lagom application, [Akka Clustering](http://conductr.lightbend.com/docs/2.0.x/AkkaAndPlay#Akka-Clustering) page in the documentation provides the instruction so [Production Suite](https://www.lightbend.com/platform/production) is able to form the Akka cluster for your application.
+For non-Lagom application, [Akka Clustering](http://conductr.lightbend.com/docs/2.0.x/AkkaAndPlay#Akka-Clustering) page in the documentation provides the instruction so [Enterprise Suite](https://www.lightbend.com/platform/production) is able to form the Akka cluster for your application.
 
-The cluster formation feature also works with a non-Akka based clustering. [ConductR Zookeeper](https://github.com/typesafehub/conductr-zookeeper) bundle is an example of this where [Production Suite](https://www.lightbend.com/platform/production) forms the Zookeeper cluster which is a non-Akka based.
+The cluster formation feature also works with a non-Akka based clustering. [ConductR Zookeeper](https://github.com/typesafehub/conductr-zookeeper) bundle is an example of this where [Enterprise Suite](https://www.lightbend.com/platform/production) forms the Zookeeper cluster which is a non-Akka based.
 
-The service orchestration and cluster formation feature from [Production Suite](https://www.lightbend.com/platform/production) also works with a non-JVM apps. [Postgrest BDR](https://github.com/huntc/postgres-bdr) bundle is an example of Docker based bundle where [Production Suite](https://www.lightbend.com/platform/production) is able to form the Postgres cluster.
+The service orchestration and cluster formation feature from [Enterprise Suite](https://www.lightbend.com/platform/production) also works with a non-JVM apps. [Postgrest BDR](https://github.com/huntc/postgres-bdr) bundle is an example of Docker based bundle where [Enterprise Suite](https://www.lightbend.com/platform/production) is able to form the Postgres cluster.
 
 
 #### Elasticity and scalability
@@ -279,17 +283,17 @@ If roles matching is enabled, only agent node which has all the roles declared b
 
 #### Process Resilience
 
-[Production Suite](https://www.lightbend.com/platform/production) monitors the services that it has started, and will ensure the number of requested instance for each services are always met.
+[Enterprise Suite](https://www.lightbend.com/platform/production) monitors the services that it has started, and will ensure the number of requested instance for each services are always met.
 
-When the service process is unexpectedly terminated, [Production Suite](https://www.lightbend.com/platform/production) will restart the process until the number of requested instance is met. In the scenario where there are multiple processes to be started, [Production Suite](https://www.lightbend.com/platform/production) will ensure the process will be restarted one after another in an orderly fashion.
+When the service process is unexpectedly terminated, [Enterprise Suite](https://www.lightbend.com/platform/production) will restart the process until the number of requested instance is met. In the scenario where there are multiple processes to be started, [Enterprise Suite](https://www.lightbend.com/platform/production) will ensure the process will be restarted one after another in an orderly fashion.
 
-In the situation when the service is unexpectedly terminated due to loss of hardware (i.e. hardware failure), [Production Suite](https://www.lightbend.com/platform/production) will attempt to start the service in the remaining machines where the service is not running until the number of requested scale is met.
+In the situation when the service is unexpectedly terminated due to loss of hardware (i.e. hardware failure), [Enterprise Suite](https://www.lightbend.com/platform/production) will attempt to start the service in the remaining machines where the service is not running until the number of requested scale is met.
 
-In the hardware failure scenario, it's possible that the number requested instances can't be met due to insufficient number machines available. However when a replacement machine is commissioned and joins the cluster, [Production Suite](https://www.lightbend.com/platform/production) will automatically attempt to start the interrupted service until the number of requested instance is met.
+In the hardware failure scenario, it's possible that the number requested instances can't be met due to insufficient number machines available. However when a replacement machine is commissioned and joins the cluster, [Enterprise Suite](https://www.lightbend.com/platform/production) will automatically attempt to start the interrupted service until the number of requested instance is met.
 
 Should the service is deployed with a bundle configuration, the bundle configuration will be automatically applied to the new instance started to replace the one that was unexpectedly terminated.
 
-This resilient behavior relieves operations from the burden of having to start the services whenever there's an unexpected termination. Should the service interruption is caused by hardware failure, operations can simply focus on hardware recovery and let [Production Suite](https://www.lightbend.com/platform/production) handle the recovery of the service instances.
+This resilient behavior relieves operations from the burden of having to start the services whenever there's an unexpected termination. Should the service interruption is caused by hardware failure, operations can simply focus on hardware recovery and let [Enterprise Suite](https://www.lightbend.com/platform/production) handle the recovery of the service instances.
 
 With this feature walkthrough, we will be simulating the automatic process recovery by terminating one of the service within Lagom Chirper.
 
@@ -341,7 +345,7 @@ conduct run activity-stream-impl --scale 1
 
 #### Rolling upgrade of the app
 
-Performing rolling upgrade on [Production Suite](https://www.lightbend.com/platform/production) is relatively straightforward.
+Performing rolling upgrade on [Enterprise Suite](https://www.lightbend.com/platform/production) is relatively straightforward.
 
 New version of a service can be deployed and run alongside an existing version. Should the new version exposes the same endpoint as the existing, while running alongside each other the traffic from the proxy will be delivered to both new and existing version in round-robin fashion.
 
@@ -365,19 +369,19 @@ d842342          chirp-impl             v1     1     0     1  web
 
 Firstly, we'll build a newer version of the `Friend` service. There's no change in the binary as such, but the process of the rolling upgrade will be the same regardless.
 
-SBT:
-```bash
-sbt friend-impl/clean friend-impl/bundle:dist && \
-conduct load -q $(find friend-impl/target -iname "friend-impl-*.zip" | head -n 1) | xargs conduct run
-```
-
 Maven:
 ```bash
 (cd friend-impl && mvn clean package docker:build) && \
 docker save chirper/friend-impl | bndl --no-default-check --endpoint friend --endpoint akka-remote | conduct load
 ```
 
-We now have a new instance of `Friend` service running alongside existing one. The existing `Friend` service has `01dd0af` as its Bundle Id while the new one has `87375e6`.
+SBT:
+```bash
+sbt friend-impl/clean friend-impl/bundle:dist && \
+conduct load -q $(find friend-impl/target -iname "friend-impl-*.zip" | head -n 1) | xargs conduct run
+```
+
+We now have a new instance of the `Friend` service running alongside the existing one. The existing `Friend` service has `01dd0af` as its Bundle Id while the new one has `87375e6`.
 
 ```
 $ conduct info
@@ -395,7 +399,7 @@ d842342          chirp-impl             v1     1     0     1  web
 1acac1d          cassandra              v3     1     0     1  cassandra
 ```
 
-At this point any HTTP requests made to the `Friend` service through the proxy will be delivered round-robin fashion between `01dd0af` and `87375e6`. The lookup to the `Friend` service through [Production Suite](https://www.lightbend.com/platform/production) service locator will also be rotated between `01dd0af` and `87375e6`.
+At this point any HTTP requests made to the `Friend` service through the proxy will be delivered round-robin fashion between `01dd0af` and `87375e6`. The lookup to the `Friend` service through [Enterprise Suite](https://www.lightbend.com/platform/production) service locator will also be rotated between `01dd0af` and `87375e6`.
 
 
 Let's stop and undeploy the existing `Friend` service. Note we are using the Bundle Id `3ff82bf` to refer to the existing `Friend` service as the name `friend-impl` is associated to both `01dd0af` and `87375e6`.
@@ -411,12 +415,12 @@ You have now performed a rolling upgrade of the `Friend` service!
 
 Dynamic proxying feature provides location transparency of your services to its clients. The caller of your services will only need to know the address of the proxy, and its requests will be routed to the available instance regardless of service address changes, or instances going up or down.
 
-[Lightbend Production Suite](https://www.lightbend.com/platform/production) allows services to expose its endpoints to be accessible via proxy. The proxy configuration will be updated as services being scaled up or down, ensuring that the requests being made to these services via the proxy will be routed to the available instance.
+[Lightbend Enterprise Suite](https://www.lightbend.com/platform/production) allows services to expose its endpoints to be accessible via proxy. The proxy configuration will be updated as services being scaled up or down, ensuring that the requests being made to these services via the proxy will be routed to the available instance.
 
 
 In this feature tour, we will scale the Lagom Chirper `Activity Stream` up and down, and we will observe the automatic changes made to the proxy configuration.
 
-[Lightbend Production Suite](https://www.lightbend.com/platform/production) uses [HAProxy](http://www.haproxy.org) as its proxying solution. In the [Production Suite Sandbox](https://www.lightbend.com/product/conductr/developer), HAProxy is started as docker image.
+[Lightbend Enterprise Suite](https://www.lightbend.com/platform/production) uses [HAProxy](http://www.haproxy.org) as its proxying solution. In the [Enterprise Suite Sandbox](https://www.lightbend.com/product/conductr/developer), HAProxy is started as docker image.
 
 To view the HAProxy configuration, execute the following command.
 
@@ -481,7 +485,7 @@ Similarly the configuration will be updated Lagom Chirper `Activity Stream` serv
 
 When the Lagom Chirper `Activity Stream` service is stopped, the entry from the HAProxy configuration is removed.
 
-[Production Suite](https://www.lightbend.com/platform/production) allows for full customization of the HAProxy configuration. Operators familiar with HAProxy may elect to fully customise the HAProxy template, and thus gain the complete control on how proxying should be implemented while having the configuration updated automatically in the events of service changes.
+[Enterprise Suite](https://www.lightbend.com/platform/production) allows for full customization of the HAProxy configuration. Operators familiar with HAProxy may elect to fully customise the HAProxy template, and thus gain the complete control on how proxying should be implemented while having the configuration updated automatically in the events of service changes.
 
 Refer to the [Dynamic Proxy Configuration documentation](http://conductr.lightbend.com/docs/2.0.x/DynamicProxyConfiguration) for more details.
 
@@ -491,9 +495,9 @@ Service locator allows a caller of a particular service to lookup the service ad
 
 As such, the list of address to all services running within the system needs to be maintained and kept up to date.
 
-When using an orchestration product that comes with built-in service registry such as [Production Suite](https://www.lightbend.com/platform/production), one can expect this list will be kept updated automatically.
+When using an orchestration product that comes with built-in service registry such as [Enterprise Suite](https://www.lightbend.com/platform/production), one can expect this list will be kept updated automatically.
 
-We will show Service Locator functionality within [Production Suite](https://www.lightbend.com/platform/production) by trying to lookup a particular user from the `Friend` service within the Lagom Chirper example.
+We will show Service Locator functionality within [Enterprise Suite](https://www.lightbend.com/platform/production) by trying to lookup a particular user from the `Friend` service within the Lagom Chirper example.
 
 Firstly, we need to register a user. Visit the `Front-End` address at http://192.168.10.1:9000/, click on the "Sign Up" button to view the registration page. Enter the `username` and `Name` as `joe` and `Joe` respectively, and click the "Submit" button.
 
@@ -534,7 +538,7 @@ web              9a2acf1-44e4d55  front-end             Running
 
 The `BUNDLE NAME` for the `Friend` service is called `friend-impl`, and it exposes its endpoint called `friendservice`.
 
-[Production Suite](https://www.lightbend.com/platform/production) exposes its service locator on port `9008`, and in the [Production Suite Sandbox](https://www.lightbend.com/product/conductr/developer) the service locator is accessible on `http://192.168.10.1:9008`.
+[Enterprise Suite](https://www.lightbend.com/platform/production) exposes its service locator on port `9008`, and in the [Enterprise Suite Sandbox](https://www.lightbend.com/product/conductr/developer) the service locator is accessible on `http://192.168.10.1:9008`.
 
 Let's find the addresses for `friendservice` by executing the following command.
 
@@ -561,11 +565,11 @@ $ curl http://192.168.10.1:9008/service-hosts/friendservice
 ["192.168.10.2:10785","192.168.10.3:10373"]
 ```
 
-[Production Suite](https://www.lightbend.com/platform/production) monitors the service it has started and keeps the list of address of the service up to date. The list is automatically updated whenever there is a change to the number of scale due to request from the operator, or due to unexpected service interruption.
+[Enterprise Suite](https://www.lightbend.com/platform/production) monitors the service it has started and keeps the list of address of the service up to date. The list is automatically updated whenever there is a change to the number of scale due to request from the operator, or due to unexpected service interruption.
 
-Since the service address list is automatically maintained by [Production Suite](https://www.lightbend.com/platform/production), applications are relieved from the burden of registering and deregistering itself with the service registry.
+Since the service address list is automatically maintained by [Enterprise Suite](https://www.lightbend.com/platform/production), applications are relieved from the burden of registering and deregistering itself with the service registry.
 
-[Production Suite](https://www.lightbend.com/platform/production) service locator also provides a HTTP redirection service to the  `friendservice` endpoint.
+[Enterprise Suite](https://www.lightbend.com/platform/production) service locator also provides a HTTP redirection service to the  `friendservice` endpoint.
 
 Execute the following command to invoke `friendservice` endpoint via HTTP redirection.
 
@@ -645,7 +649,7 @@ Note that HTTP `307` works with other HTTP verbs, so the redirect works with HTT
 
 From the developer's perspective, this would mean the HTTP request's relative path and payload to the endpoint stays the same, only the base URI where the endpoint resides will be different.
 
-From the application's perspective, the Service Locator Base URL will be provided by the `SERVICE_LOCATOR` environment variable when running within [Production Suite](https://www.lightbend.com/platform/production). When `SERVICE_LOCATOR` environment is present, configure the base URL of the endpoint by appending the endpoint name to the `SERVICE_LOCATOR`. The HTTP request made to the base URL configured in this manner will be automatically redirected to the desired endpoint.
+From the application's perspective, the Service Locator Base URL will be provided by the `SERVICE_LOCATOR` environment variable when running within [Enterprise Suite](https://www.lightbend.com/platform/production). When `SERVICE_LOCATOR` environment is present, configure the base URL of the endpoint by appending the endpoint name to the `SERVICE_LOCATOR`. The HTTP request made to the base URL configured in this manner will be automatically redirected to the desired endpoint.
 
 If the `SERVICE_LOCATOR` environment is not present, the base URL of the endpoint can fallback to a default value. This will be useful for running the caller on development environment, for example.
 
@@ -653,7 +657,7 @@ If the `SERVICE_LOCATOR` environment is not present, the base URL of the endpoin
 
 Looking at the application log files are part of the regular support activities. With applications built in microservice fashion, the number of log files to be inspected can grow significantly. The effort to inspect and trace these log files will grow significantly since each of these log files is located in separate machines.
 
-[Production Suite](https://www.lightbend.com/platform/production) provides an out-of-the-box solution to collect and consolidate the logs generated by the application deployed and launched through the [Production Suite](https://www.lightbend.com/platform/production) itself.
+[Enterprise Suite](https://www.lightbend.com/platform/production) provides an out-of-the-box solution to collect and consolidate the logs generated by the application deployed and launched through the [Enterprise Suite](https://www.lightbend.com/platform/production) itself.
 
 Once consolidated, the logs then can be viewed using `conduct logs` command.
 
@@ -703,27 +707,28 @@ Fri 2017-03-24T14:16:35+1100  Felixs-MBP-2  [info] application - Signalled start
 Fri 2017-03-24T14:16:35+1100  Felixs-MBP-2  [info] p.c.s.NettyServer - Listening for HTTP on /192.168.10.1:10822
 ```
 
-The logs collected by [Production Suite](https://www.lightbend.com/platform/production) is structured according to Syslog's definition of structured data. This structure is discussed in a greater detail in the [Logging Structure](http://conductr.lightbend.com/docs/2.0.x/ConsolidatedLogging#Logging-Structure) page.
+The logs collected by [Enterprise Suite](https://www.lightbend.com/platform/production) is structured according to Syslog's definition of structured data. This structure is discussed in a greater detail in the [Logging Structure](http://conductr.lightbend.com/docs/2.0.x/ConsolidatedLogging#Logging-Structure) page.
 
 The collected log entries can be emitted to either [Elasticsearch](http://conductr.lightbend.com/docs/2.0.x/ConsolidatedLogging#Setting-up-Elasticsearch) or [RSYSLOG](http://conductr.lightbend.com/docs/2.0.x/ConsolidatedLogging#Setting-up-RSYSLOG).
 
 When Elasticsearch is enabled, the log entries are indexed and thus they became searchable. The [Kibana UI](http://conductr.lightbend.com/docs/2.0.x/ConsolidatedLogging#Setting-up-Kibana) can be installed to provide user interface for querying these log entries.
 
-[Production Suite](https://www.lightbend.com/platform/production) consolidated logging works with both an existing Elasticsearch cluster [outside of the Production Suite](http://conductr.lightbend.com/docs/2.0.x/ConsolidatedLogging#External-Elasticsearch-cluster), or the Elasticsearch cluster [managed by the Production Suite](http://conductr.lightbend.com/docs/2.0.x/ConsolidatedLogging#Elasticsearch-on-Standalone-ConductR-cluster).
+[Enterprise Suite](https://www.lightbend.com/platform/production) consolidated logging works with both an existing Elasticsearch cluster [outside of the Enterprise Suite](http://conductr.lightbend.com/docs/2.0.x/ConsolidatedLogging#External-Elasticsearch-cluster), or the Elasticsearch cluster [managed by the Enterprise Suite](http://conductr.lightbend.com/docs/2.0.x/ConsolidatedLogging#Elasticsearch-on-Standalone-ConductR-cluster).
 
-By default [Production Suite Sandbox](https://www.lightbend.com/product/conductr/developer) starts up with a in-memory version of Elasticsearch called `eslite` to be used for development purposes. To enable the actual Elasticsearch on [Production Suite Sandbox](https://www.lightbend.com/product/conductr/developer), provide the `-f logging` option when executing `sandbox run`. The `-f logging` option will also enable Docker-based Kibana UI accessible through `http://192.168.10.1:5601`.
+By default [Enterprise Suite Sandbox](https://www.lightbend.com/product/conductr/developer) starts up with a in-memory version of Elasticsearch called `eslite` to be used for development purposes. To enable the actual Elasticsearch on [Enterprise Suite Sandbox](https://www.lightbend.com/product/conductr/developer), provide the `-f logging` option when executing `sandbox run`. The `-f logging` option will also enable Docker-based Kibana UI accessible through `http://192.168.10.1:5601`.
 
 If you wish to see the actual Elasticsearch bundle in action, execute the following command. The Sandbox Elasticsearch instance is configured with the JVM heap sized to `1GB`. Ensure your machine has sufficient memory resource to run Elasticsearch with all Lagom Chirper services.
+
+Maven:
+```bash
+sandbox run 2.0.0 -n 3 -f visualization -f logging
+./mvn-install
+```
 
 SBT:
 ```bash
 sandbox run 2.0.0 -n 3 -f visualization -f logging
 sbt install
-```
-Maven:
-```bash
-sandbox run 2.0.0 -n 3 -f visualization -f logging
-./mvn-install
 ```
 
 When using RSYSLOG, apart from directing the logs into the RSYSLOG logging service, the logs can be sent to any log aggregator that speaks syslog protocol. An example of such aggregator is [Papertrail](http://conductr.lightbend.com/docs/2.0.x/ConsolidatedLogging#Setting-up-Papertrail).
@@ -736,11 +741,11 @@ Network partition occurs when parts of the network is intermittently reachable, 
 
 Often for the purpose of resiliency and performance, multiple instances of a service are started and its state is synchronized by clustering the instances together. When network partition occurs, one or more instances of these services are separated from the rest of the network. Therefore the updates to the cluster state may not reach these orphaned instances, which may lead to inconsistencies or corruption of data managed by these service instances.
 
-[Production Suite](https://www.lightbend.com/platform/production) provides an out of the box defense against network partition in the form of Akka Split Brain Resolver (SBR) which is one of the commercial extension available from [Akka](http://akka.io/).
+[Enterprise Suite](https://www.lightbend.com/platform/production) provides an out of the box defense against network partition in the form of Akka Split Brain Resolver (SBR) which is one of the commercial extension available from [Akka](http://akka.io/).
 
-[Production Suite](https://www.lightbend.com/platform/production) comprises of core nodes and agent nodes. The core nodes contains the state of the applications managed by [Production Suite](https://www.lightbend.com/platform/production), i.e. where it's running, how many instances are requested, and whether the number of requested instances has been met. The core node is also responsible for the decision making related to scaling up and down of application instances. The agent nodes are responsible for the actual starting and stopping of the applications.
+[Enterprise Suite](https://www.lightbend.com/platform/production) comprises of core nodes and agent nodes. The core nodes contains the state of the applications managed by [Enterprise Suite](https://www.lightbend.com/platform/production), i.e. where it's running, how many instances are requested, and whether the number of requested instances has been met. The core node is also responsible for the decision making related to scaling up and down of application instances. The agent nodes are responsible for the actual starting and stopping of the applications.
 
-Upon encountering the network partition, the segment of the network which contains majority of the core node will be kept running. The remaining instances of core nodes will automatically restart itself, waiting for the opportunity to rejoin the cluster. Once the opportunity to rejoin the cluster is available (i.e. network failure is now fixed), the correct state of the applications managed by [Production Suite](https://www.lightbend.com/platform/production) will be replicated to these core nodes.
+Upon encountering the network partition, the segment of the network which contains majority of the core node will be kept running. The remaining instances of core nodes will automatically restart itself, waiting for the opportunity to rejoin the cluster. Once the opportunity to rejoin the cluster is available (i.e. network failure is now fixed), the correct state of the applications managed by [Enterprise Suite](https://www.lightbend.com/platform/production) will be replicated to these core nodes.
 
 When agent nodes encounters the network partition, each of the agent node will attempt to reconnect to core nodes on other parts of the network automatically. If the attempt to reconnect actually failed after a given period of time, the agent node will shut itself down along with all the application processes that it manages. Agent nodes will shutdown the application processes to prevent divergent application state that may occur during network partition. Once clean shutdown is accomplished, the agent node will restart and attempt to automatically reconnect to all the core nodes it has seen previously. Once it's able to rejoin the core node, if the number of application instances has not been met, the core node will instruct the agent to start the processes accordingly.
 
@@ -752,13 +757,14 @@ sandbox run 2.0.0 -n 3:3
 
 Redeploy the Lagom Chirper example.
 
-SBT:
-```bash
-sbt install
-```
 Maven:
 ```bash
 ./mvn-install
+```
+
+SBT:
+```bash
+sbt install
 ```
 
 Let's scale `Front-End` to `3` instances.
@@ -932,14 +938,14 @@ e643e4a          activity-stream-impl   v1     3     0     1  web
 1acac1d          cassandra              v3     3     0     1  cassandra
 ```
 
-[Production Suite](https://www.lightbend.com/platform/production) provides a self-healing capability when encountering network partition. Self-healing means the recovery from network partition is automatic, relieving operations from having to detect when a network partition has occured, decide which network segment to keep, and having to quickly restart multitude of instances in response to the failure.
+[Enterprise Suite](https://www.lightbend.com/platform/production) provides a self-healing capability when encountering network partition. Self-healing means the recovery from network partition is automatic, relieving operations from having to detect when a network partition has occured, decide which network segment to keep, and having to quickly restart multitude of instances in response to the failure.
 
-We believe this is one of the compelling reason why you should give [Production Suite](https://www.lightbend.com/platform/production) a try.
+We believe this is one of the compelling reason why you should give [Enterprise Suite](https://www.lightbend.com/platform/production) a try.
 
 ## Next Steps
 
-At this point you have deployed Lagom Chirper into [Production Suite Sandbox](https://www.lightbend.com/product/conductr/developer), and familiarized yourself with the feature provided by [Lightbend Production Suite](https://www.lightbend.com/platform/production).
+At this point you have deployed Lagom Chirper into [Enterprise Suite Sandbox](https://www.lightbend.com/product/conductr/developer), and familiarized yourself with the feature provided by [Lightbend Enterprise Suite](https://www.lightbend.com/platform/production).
 
-We hope that we will have sparked your interest in trying out [Production Suite Sandbox](https://www.lightbend.com/product/conductr/developer) with the applications you have written. Please head to the [documentation](https://conductr.lightbend.com/docs) for further operational and development information.
+We hope that we will have sparked your interest in trying out [Enterprise Suite Sandbox](https://www.lightbend.com/product/conductr/developer) with the applications you have written. Please head to the [documentation](https://conductr.lightbend.com/docs) for further operational and development information.
 
 Thank you!
